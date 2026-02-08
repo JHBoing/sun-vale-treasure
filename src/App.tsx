@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import { useState } from "react";
 
 const ColorValueEnum = {
   Red: 1,
@@ -56,28 +56,22 @@ function findSolution(
   slots: ColorValueEnum[],
   inventory: Inventory,
 ): { slot: number; color: ColorValueEnum }[] {
-  // Create the board state
   const board = [...slots];
   const solution = [];
-
-  // From the last slot, to first, try to find a piece in the inventory that can be placed there
-  // If the piece placed goes over the maximum value, 8, then it turns into the color of the different (sumTotal - 8)
-  //  and the next slot changes to currentColorValue + 1
 
   for (let i = board.length - 1; i >= 0; i--) {
     console.log(board);
     const currentColorValue = board[i];
     if (currentColorValue === target) {
-      continue; // already matches target, no need to place anything
+      continue;
     }
 
     for (const color in inventory) {
       const colorValue = parseInt(color) as ColorValueEnum;
       if (inventory[colorValue] > 0) {
-        // Try placing this piece in the slot
         let newColorValue = currentColorValue + colorValue;
         let carry = 0;
-        // if newColorValue is equal or exceeds 8, we need to carry over to the next slot
+
         if (newColorValue > 8) {
           carry = 1;
           newColorValue -= 8;
@@ -85,11 +79,9 @@ function findSolution(
           carry = 1;
         }
 
-        // Check if we reached the target
         if (newColorValue === target) {
           solution.push({ slot: i + 1, color: colorValue });
           board[i] = newColorValue;
-          console.log(colorValue);
 
           cascadeCarry(board, i - 1, carry);
           break;
@@ -106,7 +98,6 @@ function findSolution(
   return solution;
 }
 
-// --- Component ---
 export default function ColorPuzzle() {
   const [slots, setSlots] = useState<ColorName[]>(() => {
     const colors = Object.keys(ColorMap) as ColorName[];
@@ -115,7 +106,7 @@ export default function ColorPuzzle() {
       () => colors[Math.floor(Math.random() * colors.length)],
     );
   });
-  // inventory representes the pieces that a player has
+
   const [inventory, setInventory] = useState<Inventory>({
     [ColorValueEnum.Red]: 10,
     [ColorValueEnum.Orange]: 10,
